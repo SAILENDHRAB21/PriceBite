@@ -3,6 +3,7 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { CartItem, MenuItem } from '../data/mockData';
 import { cartStorage, authStorage, User } from '../utils/localStorage';
+import { authService } from '../services/authService';
 
 interface AppContextType {
   // Cart state
@@ -18,6 +19,10 @@ interface AppContextType {
   user: User | null;
   login: (user: User) => void;
   logout: () => void;
+
+  // Location state
+  userLocation: { latitude: number; longitude: number } | null;
+  setUserLocation: (location: { latitude: number; longitude: number } | null) => void;
 
   // Navigation state
   currentPage: string;
@@ -35,8 +40,11 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
   // Auth state
   const [user, setUser] = useState<User | null>(null);
 
+  // Location state
+  const [userLocation, setUserLocation] = useState<{ latitude: number; longitude: number } | null>(null);
+
   // Navigation state
-  const [currentPage, setCurrentPage] = useState<string>('home');
+  const [currentPage, setCurrentPage] = useState<string>('login');
   const [selectedRestaurantId, setSelectedRestaurantId] = useState<string | null>(null);
 
   // Load cart and user from localStorage on mount
@@ -50,6 +58,7 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     
     if (savedUser) {
       setUser(savedUser);
+      setCurrentPage('home'); // Go to home if user is already logged in
     }
   }, []);
 
@@ -112,6 +121,8 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
   const logout = () => {
     setUser(null);
     authStorage.clear();
+    authService.logout(); // Clear JWT token
+    setCurrentPage('login'); // Redirect to login page
   };
 
   const value: AppContextType = {
@@ -125,6 +136,8 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     user,
     login,
     logout,
+    userLocation,
+    setUserLocation,
     currentPage,
     setCurrentPage,
     selectedRestaurantId,

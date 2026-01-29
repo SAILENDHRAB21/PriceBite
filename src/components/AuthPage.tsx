@@ -2,12 +2,13 @@
 
 import React, { useState } from 'react';
 import { useApp } from '../context/AppContext';
-import { mockAPI } from '../data/mockData';
 import { Mail, Lock, User as UserIcon, Eye, EyeOff, LogIn, UserPlus } from 'lucide-react';
 import { toast } from 'sonner';
+import { getUserLocation } from '../services/geoapifyService';
+import { authService } from '../services/authService';
 
 export const AuthPage: React.FC = () => {
-  const { login, setCurrentPage } = useApp();
+  const { login, setCurrentPage, setUserLocation } = useApp();
   const [isLogin, setIsLogin] = useState(true);
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
@@ -93,12 +94,22 @@ export const AuthPage: React.FC = () => {
 
     setLoading(true);
     try {
-      const response = await mockAPI.login(loginForm.email, loginForm.password);
+      const response = await authService.login(loginForm.email, loginForm.password);
       
       if (response.success && response.user) {
         login(response.user);
         toast.success('Login successful!');
-        setCurrentPage('home');
+        
+        // Fetch user location silently
+        try {
+          const location = await getUserLocation();
+          setUserLocation(location);
+        } catch (error) {
+          // Location fetch failed, continue without location
+        }
+        
+        // Navigate to restaurants page
+        setCurrentPage('restaurants');
       } else {
         toast.error(response.message);
       }
@@ -119,17 +130,26 @@ export const AuthPage: React.FC = () => {
 
     setLoading(true);
     try {
-      const response = await mockAPI.register(
+      const response = await authService.register(
         registerForm.name,
         registerForm.email,
         registerForm.password
       );
       
-      if (response.success) {
-        // Auto login after registration
-        login({ email: registerForm.email, name: registerForm.name });
+      if (response.success && response.user) {
+        login(response.user);
         toast.success('Registration successful!');
-        setCurrentPage('home');
+        
+        // Fetch user location silently
+        try {
+          const location = await getUserLocation();
+          setUserLocation(location);
+        } catch (error) {
+          // Location fetch failed, continue without location
+        }
+        
+        // Navigate to restaurants page
+        setCurrentPage('restaurants');
       } else {
         toast.error(response.message);
       }

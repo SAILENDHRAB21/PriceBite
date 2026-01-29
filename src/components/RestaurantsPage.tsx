@@ -10,14 +10,14 @@ import { getUserLocation, getNearbyRestaurants, convertToRestaurant } from '../s
 import { toast } from 'sonner';
 
 export const RestaurantsPage: React.FC = () => {
-  const { setCurrentPage, setSelectedRestaurantId } = useApp();
+  const { setCurrentPage, setSelectedRestaurantId, userLocation: contextLocation } = useApp();
   const [restaurants, setRestaurants] = useState<Restaurant[]>([]);
   const [filteredRestaurants, setFilteredRestaurants] = useState<Restaurant[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
   const [useNearbyRestaurants, setUseNearbyRestaurants] = useState(false);
   const [locationError, setLocationError] = useState<string | null>(null);
-  const [userLocation, setUserLocation] = useState<{ latitude: number; longitude: number } | null>(null);
+  const [userLocation, setUserLocation] = useState<{ latitude: number; longitude: number } | null>(contextLocation);
 
   // Restaurant images mapping
   const restaurantImages: { [key: string]: string } = {
@@ -30,8 +30,13 @@ export const RestaurantsPage: React.FC = () => {
   };
 
   useEffect(() => {
-    // Try to load nearby restaurants first, fallback to mock if fails
-    loadNearbyRestaurants();
+    // If location is already available from context (e.g., fetched at login), use it
+    if (contextLocation) {
+      loadNearbyRestaurantsWithLocation(contextLocation);
+    } else {
+      // Otherwise try to load nearby restaurants by fetching location
+      loadNearbyRestaurants();
+    }
   }, []);
 
   useEffect(() => {
@@ -64,12 +69,35 @@ export const RestaurantsPage: React.FC = () => {
     try {
       setLoading(true);
       setLocationError(null);
-      toast.info('Getting your location...');
 
       // Get user location
       const location = await getUserLocation();
       setUserLocation(location);
-      toast.success('Location found! Fetching nearby restaurants...');
+
+      await loadNearbyRestaurantsWithLocation(location);
+    } catch (error) {
+      console.error('Error loading nearby restaurants:', error);
+      const errorMessage = error instanceof GeolocationPositionError
+        ? error.code === 1
+          ? 'Location access denied. Please enable location permissions.'
+          : error.code === 2
+          ? 'Unable to determine your location.'
+          : 'Location request timed out.'
+        : 'Failed to fetch nearby restaurants.';
+      
+      setLocationError(errorMessage);
+      toast.error(errorMessage + ' Showing mock data instead.');
+      await loadRestaurants();
+      setUseNearbyRestaurants(false);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const loadNearbyRestaurantsWithLocation = async (location: { latitude: number; longitude: number }) => {
+    try {
+      setLoading(true);
+      setUserLocation(location);
 
       // Fetch nearby restaurants
       const places = await getNearbyRestaurants(location.latitude, location.longitude);
@@ -87,17 +115,8 @@ export const RestaurantsPage: React.FC = () => {
       setUseNearbyRestaurants(true);
       toast.success(`Found ${nearbyRestaurants.length} restaurants near you!`);
     } catch (error) {
-      console.error('Error loading nearby restaurants:', error);
-      const errorMessage = error instanceof GeolocationPositionError
-        ? error.code === 1
-          ? 'Location access denied. Please enable location permissions.'
-          : error.code === 2
-          ? 'Unable to determine your location.'
-          : 'Location request timed out.'
-        : 'Failed to fetch nearby restaurants.';
-      
-      setLocationError(errorMessage);
-      toast.error(errorMessage + ' Showing mock data instead.');
+      console.error('Error fetching nearby restaurants:', error);
+      toast.error('Failed to fetch nearby restaurants. Showing mock data instead.');
       await loadRestaurants();
       setUseNearbyRestaurants(false);
     } finally {
