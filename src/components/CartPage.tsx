@@ -4,7 +4,7 @@ import React from 'react';
 import { useApp } from '../context/AppContext';
 import { Trash2, Plus, Minus, ShoppingBag, ArrowRight } from 'lucide-react';
 import { ImageWithFallback } from './figma/ImageWithFallback';
-import { toast } from 'sonner@2.0.3';
+import { toast } from 'sonner';
 
 export const CartPage: React.FC = () => {
   const { cart, updateQuantity, removeFromCart, clearCart, cartTotal, setCurrentPage, user } = useApp();
@@ -71,8 +71,8 @@ export const CartPage: React.FC = () => {
   };
 
   // Calculate fees
-  const deliveryFee = 4.99;
-  const taxRate = 0.08; // 8% tax
+  const deliveryFee = 49; // ₹49 delivery fee
+  const taxRate = 0.05; // 5% GST
   const subtotal = cartTotal;
   const tax = subtotal * taxRate;
   const total = subtotal + deliveryFee + tax;
@@ -171,9 +171,9 @@ export const CartPage: React.FC = () => {
                       </button>
                     </div>
                     <div className="text-right">
-                      <div className="text-sm text-gray-600">${item.price.toFixed(2)} each</div>
+                      <div className="text-sm text-gray-600">₹{item.price.toFixed(0)} each</div>
                       <div className="font-bold text-lg text-orange-500">
-                        ${(item.price * item.quantity).toFixed(2)}
+                        ₹{(item.price * item.quantity).toFixed(0)}
                       </div>
                     </div>
                   </div>
@@ -190,20 +190,20 @@ export const CartPage: React.FC = () => {
               <div className="space-y-3 mb-6">
                 <div className="flex justify-between text-gray-700">
                   <span>Subtotal</span>
-                  <span className="font-semibold">${subtotal.toFixed(2)}</span>
+                  <span className="font-semibold">₹{subtotal.toFixed(0)}</span>
                 </div>
                 <div className="flex justify-between text-gray-700">
                   <span>Delivery Fee</span>
-                  <span className="font-semibold">${deliveryFee.toFixed(2)}</span>
+                  <span className="font-semibold">₹{deliveryFee.toFixed(0)}</span>
                 </div>
                 <div className="flex justify-between text-gray-700">
-                  <span>Tax (8%)</span>
-                  <span className="font-semibold">${tax.toFixed(2)}</span>
+                  <span>GST (5%)</span>
+                  <span className="font-semibold">₹{tax.toFixed(0)}</span>
                 </div>
                 <div className="border-t pt-3">
                   <div className="flex justify-between text-lg font-bold text-gray-800">
                     <span>Total</span>
-                    <span className="text-orange-500">${total.toFixed(2)}</span>
+                    <span className="text-orange-500">₹{total.toFixed(0)}</span>
                   </div>
                 </div>
               </div>

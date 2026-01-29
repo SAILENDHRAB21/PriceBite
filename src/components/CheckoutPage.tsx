@@ -5,7 +5,7 @@ import { useApp } from '../context/AppContext';
 import { mockAPI } from '../data/mockData';
 import { orderStorage, Order } from '../utils/localStorage';
 import { MapPin, Phone, CreditCard, ArrowLeft } from 'lucide-react';
-import { toast } from 'sonner@2.0.3';
+import { toast } from 'sonner';
 
 export const CheckoutPage: React.FC = () => {
   const { cart, cartTotal, clearCart, setCurrentPage, user } = useApp();
@@ -21,8 +21,8 @@ export const CheckoutPage: React.FC = () => {
   });
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
 
-  const deliveryFee = 4.99;
-  const taxRate = 0.08;
+  const deliveryFee = 49; // ₹49 delivery fee
+  const taxRate = 0.05; // 5% GST
   const subtotal = cartTotal;
   const tax = subtotal * taxRate;
   const total = subtotal + deliveryFee + tax;
@@ -32,7 +32,7 @@ export const CheckoutPage: React.FC = () => {
 
     if (!formData.address.trim()) newErrors.address = 'Address is required';
     if (!formData.city.trim()) newErrors.city = 'City is required';
-    if (!formData.zipCode.trim()) newErrors.zipCode = 'ZIP code is required';
+    if (!formData.zipCode.trim()) newErrors.zipCode = 'PIN code is required';
     if (!formData.phone.trim()) {
       newErrors.phone = 'Phone number is required';
     } else if (!/^\d{10}$/.test(formData.phone.replace(/\D/g, ''))) {
@@ -173,14 +173,14 @@ export const CheckoutPage: React.FC = () => {
                           ? 'border-red-500 focus:ring-red-500'
                           : 'border-gray-300 focus:ring-orange-500'
                       }`}
-                      placeholder="New York"
+                      placeholder="Mumbai"
                     />
                     {errors.city && <p className="mt-1 text-sm text-red-500">{errors.city}</p>}
                   </div>
 
                   <div>
                     <label className="block text-sm font-semibold text-gray-700 mb-2">
-                      ZIP Code
+                      PIN Code
                     </label>
                     <input
                       type="text"
@@ -194,7 +194,7 @@ export const CheckoutPage: React.FC = () => {
                           ? 'border-red-500 focus:ring-red-500'
                           : 'border-gray-300 focus:ring-orange-500'
                       }`}
-                      placeholder="10001"
+                      placeholder="400001"
                     />
                     {errors.zipCode && <p className="mt-1 text-sm text-red-500">{errors.zipCode}</p>}
                   </div>
@@ -218,7 +218,7 @@ export const CheckoutPage: React.FC = () => {
                           ? 'border-red-500 focus:ring-red-500'
                           : 'border-gray-300 focus:ring-orange-500'
                       }`}
-                      placeholder="(555) 123-4567"
+                      placeholder="9876543210"
                     />
                   </div>
                   {errors.phone && <p className="mt-1 text-sm text-red-500">{errors.phone}</p>}
@@ -313,20 +313,20 @@ export const CheckoutPage: React.FC = () => {
               <div className="space-y-3 mb-6">
                 <div className="flex justify-between text-gray-700">
                   <span>Items ({cart.length})</span>
-                  <span className="font-semibold">${subtotal.toFixed(2)}</span>
+                  <span className="font-semibold">₹{subtotal.toFixed(0)}</span>
                 </div>
                 <div className="flex justify-between text-gray-700">
                   <span>Delivery Fee</span>
-                  <span className="font-semibold">${deliveryFee.toFixed(2)}</span>
+                  <span className="font-semibold">₹{deliveryFee.toFixed(0)}</span>
                 </div>
                 <div className="flex justify-between text-gray-700">
-                  <span>Tax (8%)</span>
-                  <span className="font-semibold">${tax.toFixed(2)}</span>
+                  <span>GST (5%)</span>
+                  <span className="font-semibold">₹{tax.toFixed(0)}</span>
                 </div>
                 <div className="border-t pt-3">
                   <div className="flex justify-between text-lg font-bold text-gray-800">
                     <span>Total</span>
-                    <span className="text-orange-500">${total.toFixed(2)}</span>
+                    <span className="text-orange-500">₹{total.toFixed(0)}</span>
                   </div>
                 </div>
               </div>
@@ -342,7 +342,7 @@ export const CheckoutPage: React.FC = () => {
                     Processing...
                   </span>
                 ) : (
-                  `Place Order - $${total.toFixed(2)}`
+                  `Place Order - ₹${total.toFixed(0)}`
                 )}
               </button>
             </div>

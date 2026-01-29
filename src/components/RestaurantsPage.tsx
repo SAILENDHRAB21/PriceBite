@@ -4,8 +4,10 @@ import React, { useState, useEffect } from 'react';
 import { useApp } from '../context/AppContext';
 import { mockAPI } from '../data/mockData';
 import { Restaurant } from '../data/mockData';
-import { Search, Star, Clock, ChevronRight } from 'lucide-react';
+import { Search, Star, Clock, ChevronRight, MapPin, Navigation } from 'lucide-react';
 import { ImageWithFallback } from './figma/ImageWithFallback';
+import { getUserLocation, getNearbyRestaurants, convertToRestaurant } from '../services/geoapifyService';
+import { toast } from 'sonner';
 
 export const RestaurantsPage: React.FC = () => {
   const { setCurrentPage, setSelectedRestaurantId } = useApp();
@@ -13,6 +15,9 @@ export const RestaurantsPage: React.FC = () => {
   const [filteredRestaurants, setFilteredRestaurants] = useState<Restaurant[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
+  const [useNearbyRestaurants, setUseNearbyRestaurants] = useState(false);
+  const [locationError, setLocationError] = useState<string | null>(null);
+  const [userLocation, setUserLocation] = useState<{ latitude: number; longitude: number } | null>(null);
 
   // Restaurant images mapping
   const restaurantImages: { [key: string]: string } = {
@@ -25,7 +30,8 @@ export const RestaurantsPage: React.FC = () => {
   };
 
   useEffect(() => {
-    loadRestaurants();
+    // Try to load nearby restaurants first, fallback to mock if fails
+    loadNearbyRestaurants();
   }, []);
 
   useEffect(() => {
@@ -54,6 +60,51 @@ export const RestaurantsPage: React.FC = () => {
     }
   };
 
+  const loadNearbyRestaurants = async () => {
+    try {
+      setLoading(true);
+      setLocationError(null);
+      toast.info('Getting your location...');
+
+      // Get user location
+      const location = await getUserLocation();
+      setUserLocation(location);
+      toast.success('Location found! Fetching nearby restaurants...');
+
+      // Fetch nearby restaurants
+      const places = await getNearbyRestaurants(location.latitude, location.longitude);
+      
+      if (places.length === 0) {
+        toast.warning('No restaurants found nearby. Showing mock data.');
+        await loadRestaurants();
+        setUseNearbyRestaurants(false);
+        return;
+      }
+
+      const nearbyRestaurants = places.map((place, index) => convertToRestaurant(place, index));
+      setRestaurants(nearbyRestaurants);
+      setFilteredRestaurants(nearbyRestaurants);
+      setUseNearbyRestaurants(true);
+      toast.success(`Found ${nearbyRestaurants.length} restaurants near you!`);
+    } catch (error) {
+      console.error('Error loading nearby restaurants:', error);
+      const errorMessage = error instanceof GeolocationPositionError
+        ? error.code === 1
+          ? 'Location access denied. Please enable location permissions.'
+          : error.code === 2
+          ? 'Unable to determine your location.'
+          : 'Location request timed out.'
+        : 'Failed to fetch nearby restaurants.';
+      
+      setLocationError(errorMessage);
+      toast.error(errorMessage + ' Showing mock data instead.');
+      await loadRestaurants();
+      setUseNearbyRestaurants(false);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const handleRestaurantClick = (restaurantId: string) => {
     setSelectedRestaurantId(restaurantId);
     setCurrentPage('menu');
@@ -64,8 +115,44 @@ export const RestaurantsPage: React.FC = () => {
       {/* Header Section */}
       <div className="bg-gradient-to-r from-orange-500 to-red-500 text-white py-12">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <h1 className="text-4xl font-bold mb-4">All Restaurants</h1>
-          <p className="text-xl opacity-90">Discover the best food near you</p>
+          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+            <div>
+              <h1 className="text-4xl font-bold mb-4">
+                {useNearbyRestaurants ? 'Nearby Restaurants' : 'All Restaurants'}
+              </h1>
+              <p className="text-xl opacity-90">
+                {useNearbyRestaurants ? 'Restaurants near your location' : 'Discover the best food near you'}
+              </p>
+            </div>
+            <button
+              onClick={useNearbyRestaurants ? loadRestaurants : loadNearbyRestaurants}
+              disabled={loading}
+              className="flex items-center gap-2 px-6 py-3 bg-white text-orange-500 rounded-full font-semibold hover:bg-orange-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed shadow-lg"
+            >
+              {loading ? (
+                <>
+                  <div className="animate-spin rounded-full h-5 w-5 border-2 border-orange-500 border-t-transparent"></div>
+                  Loading...
+                </>
+              ) : useNearbyRestaurants ? (
+                <>
+                  <MapPin className="h-5 w-5" />
+                  Show All
+                </>
+              ) : (
+                <>
+                  <Navigation className="h-5 w-5" />
+                  Find Nearby
+                </>
+              )}
+            </button>
+          </div>
+          {userLocation && useNearbyRestaurants && (
+            <div className="mt-4 flex items-center gap-2 text-sm opacity-90">
+              <MapPin className="h-4 w-4" />
+              Your location: {userLocation.latitude.toFixed(4)}, {userLocation.longitude.toFixed(4)}
+            </div>
+          )}
         </div>
       </div>
 
@@ -113,7 +200,11 @@ export const RestaurantsPage: React.FC = () => {
                 >
                   <div className="relative h-48 overflow-hidden">
                     <ImageWithFallback
-                      src={restaurantImages[restaurant.id] || 'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=400'}
+                      src={
+                        useNearbyRestaurants && restaurant.image
+                          ? restaurant.image
+                          : restaurantImages[restaurant.id] || 'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=400'
+                      }
                       alt={restaurant.name}
                       className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
                     />

@@ -10,7 +10,7 @@ import { CartPage } from './components/CartPage';
 import { AuthPage } from './components/AuthPage';
 import { CheckoutPage } from './components/CheckoutPage';
 import { OrderConfirmationPage } from './components/OrderConfirmationPage';
-import { Toaster } from 'sonner@2.0.3';
+import { Toaster } from 'sonner';
 
 // Router component to handle page navigation
 const AppRouter: React.FC = () => {

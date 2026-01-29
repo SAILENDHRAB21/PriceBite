@@ -147,7 +147,7 @@ export const HomePage: React.FC = () => {
                   <h3 className="font-semibold text-lg mb-1 text-gray-800">{dish.name}</h3>
                   <p className="text-gray-600 text-sm mb-3 line-clamp-2">{dish.description}</p>
                   <div className="flex items-center justify-between">
-                    <span className="text-2xl font-bold text-orange-500">${dish.price.toFixed(2)}</span>
+                    <span className="text-2xl font-bold text-orange-500">₹{dish.price.toFixed(0)}</span>
                     <button
                       type="button"
                       onClick={() => addToCart(dish)}

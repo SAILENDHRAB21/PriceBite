@@ -70,9 +70,9 @@ export const OrderConfirmationPage: React.FC = () => {
   ];
 
   const formatDate = (timestamp: number): string => {
-    return new Date(timestamp).toLocaleString('en-US', {
-      month: 'short',
+    return new Date(timestamp).toLocaleString('en-IN', {
       day: 'numeric',
+      month: 'short',
       year: 'numeric',
       hour: 'numeric',
       minute: '2-digit',
@@ -163,7 +163,7 @@ export const OrderConfirmationPage: React.FC = () => {
                     <p className="text-sm text-gray-600">Qty: {item.quantity}</p>
                   </div>
                   <p className="font-semibold text-gray-800">
-                    ${(item.price * item.quantity).toFixed(2)}
+                    ₹{(item.price * item.quantity).toFixed(0)}
                   </p>
                 </div>
               ))}
@@ -172,7 +172,7 @@ export const OrderConfirmationPage: React.FC = () => {
             <div className="border-t mt-4 pt-4">
               <div className="flex justify-between text-xl font-bold text-gray-800">
                 <span>Total</span>
-                <span className="text-orange-500">${order.total.toFixed(2)}</span>
+                <span className="text-orange-500">₹{order.total.toFixed(0)}</span>
               </div>
             </div>
           </div>

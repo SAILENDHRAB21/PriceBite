@@ -6,7 +6,7 @@ import { mockAPI } from '../data/mockData';
 import { Restaurant, MenuItem } from '../data/mockData';
 import { ArrowLeft, Star, Clock, Plus, Minus, ShoppingCart } from 'lucide-react';
 import { ImageWithFallback } from './figma/ImageWithFallback';
-import { toast } from 'sonner@2.0.3';
+import { toast } from 'sonner';
 
 export const MenuPage: React.FC = () => {
   const { setCurrentPage, selectedRestaurantId, addToCart, cart } = useApp();
@@ -191,7 +191,7 @@ export const MenuPage: React.FC = () => {
                     </div>
                     <p className="text-gray-600 text-sm mb-3 line-clamp-2">{item.description}</p>
                     <div className="flex items-center justify-between">
-                      <span className="text-2xl font-bold text-orange-500">${item.price.toFixed(2)}</span>
+                      <span className="text-2xl font-bold text-orange-500">₹{item.price.toFixed(0)}</span>
                       <button
                         onClick={() => handleAddToCart(item)}
                         className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-orange-500 to-red-500 text-white rounded-full font-semibold hover:shadow-lg transition-shadow"

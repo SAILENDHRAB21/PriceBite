@@ -8,6 +8,8 @@ export interface Restaurant {
   deliveryTime: string;
   category: string;
   description: string;
+  latitude?: number;
+  longitude?: number;
 }
 
 export interface MenuItem {
@@ -89,7 +91,7 @@ export const menuItems: MenuItem[] = [
     restaurantId: "1",
     name: "Margherita Pizza",
     description: "Classic tomato sauce, mozzarella, and basil",
-    price: 12.99,
+    price: 349,
     image: "margherita-pizza",
     category: "Pizza",
     isVeg: true
@@ -99,7 +101,7 @@ export const menuItems: MenuItem[] = [
     restaurantId: "1",
     name: "Pepperoni Pizza",
     description: "Loaded with pepperoni and cheese",
-    price: 15.99,
+    price: 449,
     image: "pepperoni-pizza",
     category: "Pizza",
     isVeg: false
@@ -109,7 +111,7 @@ export const menuItems: MenuItem[] = [
     restaurantId: "1",
     name: "Veggie Supreme",
     description: "Fresh vegetables and herbs on thin crust",
-    price: 14.99,
+    price: 399,
     image: "veggie-pizza",
     category: "Pizza",
     isVeg: true
@@ -120,7 +122,7 @@ export const menuItems: MenuItem[] = [
     restaurantId: "2",
     name: "Classic Cheeseburger",
     description: "Beef patty with cheese, lettuce, and tomato",
-    price: 9.99,
+    price: 199,
     image: "cheeseburger",
     category: "Burger",
     isVeg: false
@@ -130,7 +132,7 @@ export const menuItems: MenuItem[] = [
     restaurantId: "2",
     name: "Chicken Burger",
     description: "Crispy chicken with mayo and pickles",
-    price: 10.99,
+    price: 229,
     image: "chicken-burger",
     category: "Burger",
     isVeg: false
@@ -140,7 +142,7 @@ export const menuItems: MenuItem[] = [
     restaurantId: "2",
     name: "Veggie Burger",
     description: "Plant-based patty with fresh veggies",
-    price: 8.99,
+    price: 169,
     image: "veggie-burger",
     category: "Burger",
     isVeg: true
@@ -151,7 +153,7 @@ export const menuItems: MenuItem[] = [
     restaurantId: "3",
     name: "California Roll",
     description: "Crab, avocado, and cucumber",
-    price: 11.99,
+    price: 449,
     image: "california-roll",
     category: "Sushi",
     isVeg: false
@@ -161,7 +163,7 @@ export const menuItems: MenuItem[] = [
     restaurantId: "3",
     name: "Salmon Nigiri",
     description: "Fresh salmon over seasoned rice",
-    price: 13.99,
+    price: 549,
     image: "salmon-sushi",
     category: "Sushi",
     isVeg: false
@@ -171,7 +173,7 @@ export const menuItems: MenuItem[] = [
     restaurantId: "3",
     name: "Vegetable Tempura Roll",
     description: "Crispy vegetables with soy sauce",
-    price: 10.99,
+    price: 399,
     image: "tempura-roll",
     category: "Sushi",
     isVeg: true
@@ -182,7 +184,7 @@ export const menuItems: MenuItem[] = [
     restaurantId: "4",
     name: "Chicken Tikka Masala",
     description: "Tender chicken in creamy tomato curry",
-    price: 14.99,
+    price: 329,
     image: "chicken-tikka",
     category: "Curry",
     isVeg: false
@@ -192,7 +194,7 @@ export const menuItems: MenuItem[] = [
     restaurantId: "4",
     name: "Paneer Butter Masala",
     description: "Cottage cheese in rich buttery gravy",
-    price: 12.99,
+    price: 279,
     image: "paneer-butter",
     category: "Curry",
     isVeg: true
@@ -202,7 +204,7 @@ export const menuItems: MenuItem[] = [
     restaurantId: "4",
     name: "Naan Bread",
     description: "Freshly baked in tandoor oven",
-    price: 2.99,
+    price: 49,
     image: "naan-bread",
     category: "Bread",
     isVeg: true
@@ -213,7 +215,7 @@ export const menuItems: MenuItem[] = [
     restaurantId: "5",
     name: "Fettuccine Alfredo",
     description: "Creamy parmesan sauce with fettuccine",
-    price: 13.99,
+    price: 329,
     image: "fettuccine-alfredo",
     category: "Pasta",
     isVeg: true
@@ -223,7 +225,7 @@ export const menuItems: MenuItem[] = [
     restaurantId: "5",
     name: "Spaghetti Carbonara",
     description: "Eggs, cheese, and crispy bacon",
-    price: 14.99,
+    price: 349,
     image: "carbonara",
     category: "Pasta",
     isVeg: false
@@ -233,7 +235,7 @@ export const menuItems: MenuItem[] = [
     restaurantId: "5",
     name: "Penne Arrabbiata",
     description: "Spicy tomato sauce with garlic",
-    price: 12.99,
+    price: 299,
     image: "penne-arrabbiata",
     category: "Pasta",
     isVeg: true
@@ -244,7 +246,7 @@ export const menuItems: MenuItem[] = [
     restaurantId: "6",
     name: "Beef Tacos",
     description: "Seasoned beef with salsa and cheese",
-    price: 9.99,
+    price: 249,
     image: "beef-tacos",
     category: "Tacos",
     isVeg: false
@@ -254,7 +256,7 @@ export const menuItems: MenuItem[] = [
     restaurantId: "6",
     name: "Chicken Burrito",
     description: "Grilled chicken, rice, beans, and guac",
-    price: 11.99,
+    price: 299,
     image: "chicken-burrito",
     category: "Burrito",
     isVeg: false
@@ -264,7 +266,7 @@ export const menuItems: MenuItem[] = [
     restaurantId: "6",
     name: "Veggie Quesadilla",
     description: "Grilled vegetables and melted cheese",
-    price: 8.99,
+    price: 219,
     image: "veggie-quesadilla",
     category: "Quesadilla",
     isVeg: true

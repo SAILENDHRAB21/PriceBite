@@ -4,7 +4,7 @@ import React, { useState } from 'react';
 import { useApp } from '../context/AppContext';
 import { mockAPI } from '../data/mockData';
 import { Mail, Lock, User as UserIcon, Eye, EyeOff, LogIn, UserPlus } from 'lucide-react';
-import { toast } from 'sonner@2.0.3';
+import { toast } from 'sonner';
 
 export const AuthPage: React.FC = () => {
   const { login, setCurrentPage } = useApp();
